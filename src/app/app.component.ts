@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChatSynkComponent } from './chat-synk/chat-synk.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ChatSynkComponent],
   template: `
-    <h1>Welcome to {{title}}!</h1>
-
-    
+  <chat-synk></chat-synk>
   `,
   styles: [],
 })

@@ -1,0 +1,4 @@
+<ng-container *ngIf="chatOpen">
+  <chat-window [contactId]="contactId"></chat-window>
+</ng-container>
+<chat-avatar (toggle)="toggleChat()"></chat-avatar>

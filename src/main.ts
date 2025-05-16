@@ -1,41 +1,60 @@
 import 'zone.js';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { ChatWidgetComponent } from './app/chat-widget/chat-widget.component';
 import { provideHttpClient } from '@angular/common/http';
+import { NgZone } from '@angular/core';
+import { ChatSynkComponent } from './app/chat-synk/chat-synk.component';
 import { createComponentRef } from './utils/create-component-ref';
 
-
+const WIDGET_SELECTOR = 'chat-synk';
 let componentRef: any = null;
 
-export function initChatWidget(config: { apiKey?: string; }) {
-  const selector = 'chat-widget-root';
+/**
+ * Initializes the chat widget and bootstraps the Angular component.
+ */
+export function initChatWidget(config: { apiKey?: string }) {
+  ensureWidgetElement(WIDGET_SELECTOR);
 
-  if (!document.querySelector(selector)) {
-    const el = document.createElement(selector);
-    document.body.appendChild(el);
-  }
-
-  bootstrapApplication(ChatWidgetComponent, {
+  bootstrapApplication(ChatSynkComponent, {
     providers: [provideHttpClient()],
   }).then(appRef => {
-    componentRef = createComponentRef(appRef, ChatWidgetComponent, selector);
-    Object.assign(componentRef.instance, config);
-    componentRef.changeDetectorRef.detectChanges();
-  }).catch(err => console.error('Bootstrap error:', err));
+    const ngZone = appRef.injector.get(NgZone);
+    ngZone.run(() => {
+      componentRef = createComponentRef(appRef, ChatSynkComponent, WIDGET_SELECTOR);
+      Object.assign(componentRef.instance, config);
+      componentRef.changeDetectorRef.detectChanges();
+    });
+  }).catch(err => console.error('[ChatWidget] Bootstrap error:', err));
 }
 
-function loadContact(contact: { name: string; email?: string; phone?: string }) {
+/**
+ * Passes contact information to the widget.
+ */
+export function loadContact(contact: { name: string; email?: string; phone?: string }) {
   if (componentRef) {
     componentRef.instance.contact = contact;
     componentRef.changeDetectorRef.detectChanges();
   } else {
-    console.warn('ChatWidget is not initialized yet.');
+    console.warn('[ChatWidget] Widget is not initialized yet.');
   }
 }
-// Optional auto-bootstrap if needed
-// initChatWidget({});
 
+/**
+ * Ensures the root widget DOM element is present in the document.
+ */
+function ensureWidgetElement(selector: string): void {
+  if (!document.querySelector(selector)) {
+    const el = document.createElement(selector);
+    document.body.appendChild(el);
+  }
+}
+
+// Auto-bootstrap if needed (useful for dev or fallback)
+initChatWidget({});
+
+/**
+ * Expose widget API on window for external use.
+ */
 (window as any).ChatWidget = {
   init: initChatWidget,
-  loadContact: loadContact
+  loadContact: loadContact,
 };
