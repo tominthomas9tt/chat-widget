@@ -38,22 +38,6 @@
     }
 }
 
-.emoji-picker {
-    // display: none;
-    position: absolute;
-    bottom: 60px;
-    left: 0;
-    width: 100%;
-    background: white;
-    border-top: 1px solid #e5e7eb;
-    padding: 10px;
-    z-index: 10;
-}
-
-.emoji-btn:hover {
-    background-color: #f3f4f6;
-}
-
 .typing-indicator {
   display: flex;
   gap: 3px;

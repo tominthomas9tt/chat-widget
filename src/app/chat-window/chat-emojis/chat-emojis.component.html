@@ -1,0 +1,7 @@
+<div class="emoji-picker p-2" *ngIf="showEmojiPicker">
+  <div class="grid grid-cols-8 gap-2">
+    <button *ngFor="let emoji of emojis" (click)="addEmoji(emoji)" class="emoji-btn p-1 rounded hover:bg-gray-100">
+      {{ emoji }}
+    </button>
+  </div>
+</div>

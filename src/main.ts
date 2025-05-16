@@ -14,7 +14,7 @@ let componentRef: any = null;
 export function initChatWidget(config: { apiKey?: string }) {
   ensureWidgetElement(WIDGET_SELECTOR);
 
-  bootstrapApplication(ChatSynkComponent, {
+  return bootstrapApplication(ChatSynkComponent, {
     providers: [provideHttpClient()],
   }).then(appRef => {
     const ngZone = appRef.injector.get(NgZone);
@@ -29,9 +29,9 @@ export function initChatWidget(config: { apiKey?: string }) {
 /**
  * Passes contact information to the widget.
  */
-export function loadContact(contact: { name: string; email?: string; phone?: string }) {
+export function loadContact(contactId: number) {
   if (componentRef) {
-    componentRef.instance.contact = contact;
+    componentRef.instance.contactId = contactId;
     componentRef.changeDetectorRef.detectChanges();
   } else {
     console.warn('[ChatSynk] is not initialized yet.');
@@ -44,7 +44,7 @@ function loadTailwindStyles() {
     link.id = 'tailwind-styles';
     link.rel = 'stylesheet';
     // Adjust path depending on where styles.css is hosted/deployed
-    link.href = 'http://localhost/chatwidget/styles.css'; 
+    link.href = 'http://localhost/chatwidget/styles.css';
     document.head.appendChild(link);
   }
 }
@@ -61,8 +61,9 @@ function ensureWidgetElement(selector: string): void {
 
 // Auto-bootstrap if needed (useful for dev or fallback)
 loadTailwindStyles();
-initChatWidget({});
-
+initChatWidget({}).then(() => {
+  loadContact(46);
+});
 /**
  * Expose widget API on window for external use.
  */
