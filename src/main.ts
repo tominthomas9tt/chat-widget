@@ -23,7 +23,7 @@ export function initChatWidget(config: { apiKey?: string }) {
       Object.assign(componentRef.instance, config);
       componentRef.changeDetectorRef.detectChanges();
     });
-  }).catch(err => console.error('[ChatWidget] Bootstrap error:', err));
+  }).catch(err => console.error('[ChatSynk] Bootstrap error:', err));
 }
 
 /**
@@ -34,7 +34,18 @@ export function loadContact(contact: { name: string; email?: string; phone?: str
     componentRef.instance.contact = contact;
     componentRef.changeDetectorRef.detectChanges();
   } else {
-    console.warn('[ChatWidget] Widget is not initialized yet.');
+    console.warn('[ChatSynk] is not initialized yet.');
+  }
+}
+
+function loadTailwindStyles() {
+  if (!document.getElementById('tailwind-styles')) {
+    const link = document.createElement('link');
+    link.id = 'tailwind-styles';
+    link.rel = 'stylesheet';
+    // Adjust path depending on where styles.css is hosted/deployed
+    link.href = 'http://localhost/chatwidget/styles.css'; 
+    document.head.appendChild(link);
   }
 }
 
@@ -49,6 +60,7 @@ function ensureWidgetElement(selector: string): void {
 }
 
 // Auto-bootstrap if needed (useful for dev or fallback)
+loadTailwindStyles();
 initChatWidget({});
 
 /**

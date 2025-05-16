@@ -1,0 +1,33 @@
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'chat-head',
+  standalone: true,
+  imports: [],
+  template: `
+    <div class="bg-emerald-600 text-white px-4 py-3 flex items-center">
+    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mr-3">
+      <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    </div>
+    <div>
+      <h2 class="font-semibold text-lg">Sarah Johnson</h2>
+      <p class="text-xs text-emerald-100">Online</p>
+    </div>
+    <div class="ml-auto flex space-x-3">
+      <button class="p-1 rounded-full hover:bg-emerald-700 transition">
+        <svg class="h-5 w-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+        </svg>
+      </button>
+    </div>
+  </div>
+  `,
+  styles: ``
+})
+export class ChatHeadComponent {
+
+}

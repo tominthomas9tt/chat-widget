@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { ChatHeadComponent } from './chat-head/chat-head.component';
 
 @Component({
   selector: 'chat-window',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,ChatHeadComponent],
   templateUrl: './chat-window.component.html',
   styleUrl: './chat-window.component.scss'
 })
