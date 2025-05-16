@@ -1,0 +1,14 @@
+<div [ngStyle]="{'background': theme.background, 'color': theme.color}"
+         style="position: fixed; bottom: 1rem; right: 1rem; border: 1px solid #ccc; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px;">
+      <button style="float:right" (click)="close()">✖</button>
+      <h4>{{ title }}</h4>
+
+      <div *ngIf="contact" style="margin-bottom: 0.5rem; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem;">
+        <strong>Contact Info:</strong><br/>
+        {{ contact.name }} <br/>
+        <small *ngIf="contact.email">Email: {{ contact.email }}</small><br/>
+        <small *ngIf="contact.phone">Phone: {{ contact.phone }}</small>
+      </div>
+
+      <p>{{ message }}</p>
+    </div>

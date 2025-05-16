@@ -1,13 +1,26 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
+
+interface Contact {
+  name: string;
+  email?: string;
+  phone?: string;
+}
 
 @Component({
   selector: 'chat-widget-root',
   standalone: true,
-  template: `
-    <div style="position: fixed; bottom: 1rem; right: 1rem; background: white; border: 1px solid #ccc; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-      <h4>Chat Widget</h4>
-      <p>This is a chat box</p>
-    </div>
-  `,
+  imports: [CommonModule],
+  templateUrl: './chat-widget.component.html'
 })
-export class ChatWidgetComponent {}
+export class ChatWidgetComponent {
+  @Input() title: string = 'Chat Widget';
+  @Input() message: string = 'This is a chat box';
+  @Input() theme = { background: 'white', color: 'black' };
+  @Input() contact?: Contact;
+
+  close() {
+    const el = document.querySelector('chat-widget-root');
+    if (el) el.remove();
+  }
+}
