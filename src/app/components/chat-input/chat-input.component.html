@@ -4,7 +4,7 @@
 
   <div class="bg-white dark:bg-[#1F2C34] p-3 border-t border-gray-200 dark:border-gray-700">
     <div class="flex items-end space-x-2">
-      <div class="flex-1 flex items-end bg-[#F0F2F5] dark:bg-[#111B21] rounded-half px-3 py-2">
+      <div class="flex-1 flex items-end bg-[#F0F2F5] dark:bg-[#111B21] rounded-md px-3 py-2">
         <textarea #textarea [(ngModel)]="message" rows="1"
           class="bg-transparent w-full resize-none overflow-hidden focus:outline-none text-sm text-[#111B21] dark:text-white"
           placeholder="Type a message..." (keydown)="handleKeyDown($event)" (input)="autoGrow()"></textarea>
