@@ -1,0 +1,7 @@
+<div class="flex flex-wrap gap-2">
+  <button *ngFor="let option of options"
+          (click)="send(option)"
+          class="quick-reply bg-[#F0F2F5] hover:bg-gray-300 dark:bg-[#1F2C34] dark:hover:bg-gray-700 px-3 py-1.5 rounded-full text-sm text-[#111B21] dark:text-white">
+    {{ option }}
+  </button>
+</div>

@@ -1,0 +1,16 @@
+<div *ngIf="isRecording"
+     class="absolute inset-x-0 bottom-16 p-4 bg-white dark:bg-[#1F2C34] border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+  <div class="flex items-center">
+    <div class="w-3 h-3 bg-[#FF3B30] rounded-full mr-3 recording-pulse"></div>
+    <span class="text-[#111B21] dark:text-white font-medium">{{ formattedTime }}</span>
+  </div>
+  <div class="flex items-center space-x-3">
+    <button (click)="cancelRecording()" class="text-[#FF3B30]">
+      <i class="fas fa-trash"></i>
+    </button>
+    <button (click)="sendRecording()"
+            class="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center text-white">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+.chat-bubble-user {
+    background-color: #D9FDD3;
+    border-radius: 12px 0 12px 12px;
+}
+
+.chat-bubble-agent {
+    background-color: #FFFFFF;
+    border-radius: 0 12px 12px 12px;
+}
+
+.dark .chat-bubble-user {
+    background-color: #005C4B;
+    color: white;
+}
+
+.dark .chat-bubble-agent {
+    background-color: #1F2C34;
+    color: white;
+}
+
+.timestamp {
+    position: relative;
+}
+
+.timestamp::before,
+.timestamp::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 35%;
+    height: 1px;
+    background-color: #667781;
+}
+
+.timestamp::before {
+    left: 0;
+}
+
+.timestamp::after {
+    right: 0;
+}
+
+.dark .timestamp::before,
+.dark .timestamp::after {
+    background-color: #4A5568;
+}

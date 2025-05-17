@@ -1,0 +1,8 @@
+.attachment-menu {
+  position: absolute;
+  bottom: 100%;           // appears above input bar
+  left: 1;                // align to input left edge
+  margin-bottom: 0.5rem;
+  z-index: 50;
+  @apply bg-white dark:bg-[#1F2C34] rounded-lg shadow-lg w-64 p-2;
+}

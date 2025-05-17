@@ -2,10 +2,11 @@ import 'zone.js';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { NgZone } from '@angular/core';
-import { ChatSynkComponent } from './app/chat-synk/chat-synk.component';
+// import { ChatSynkComponent } from './app/chat-synk/chat-synk.component';
 import { createComponentRef } from './utils/create-component-ref';
+import { ChatWidgetComponent } from './app/components/chat-widget/chat-widget.component';
 
-const WIDGET_SELECTOR = 'chat-synk';
+const WIDGET_SELECTOR = 'chat-widget';
 let componentRef: any = null;
 
 /**
@@ -14,12 +15,12 @@ let componentRef: any = null;
 export function initChatWidget(config: { apiKey?: string }) {
   ensureWidgetElement(WIDGET_SELECTOR);
 
-  return bootstrapApplication(ChatSynkComponent, {
+  return bootstrapApplication(ChatWidgetComponent, {
     providers: [provideHttpClient()],
   }).then(appRef => {
     const ngZone = appRef.injector.get(NgZone);
     ngZone.run(() => {
-      componentRef = createComponentRef(appRef, ChatSynkComponent, WIDGET_SELECTOR);
+      componentRef = createComponentRef(appRef, ChatWidgetComponent, WIDGET_SELECTOR);
       Object.assign(componentRef.instance, config);
       componentRef.changeDetectorRef.detectChanges();
     });

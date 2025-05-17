@@ -1,6 +1,6 @@
 
 // const BASE_URL = "https://api.stjohnstravel.co.uk/api";
-const BASE_URL = "http://192.168.1.9:8080/api.chatsynk.com/api";
+const BASE_URL = "http://localhost/api.chatsynk.com/api";
 const SECURE_BASE_URL = BASE_URL + "/secured";
 const COMMON_BASE_URL = BASE_URL + "/common";
 

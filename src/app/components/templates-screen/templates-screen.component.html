@@ -1,0 +1,18 @@
+<div class="absolute inset-0 bg-white dark:bg-[#111B21] flex flex-col">
+  <div class="chat-header text-white p-3 flex items-center">
+    <button (click)="goBack()" class="p-2 hover:bg-white/10 rounded-full transition mr-2">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <h3 class="font-semibold">Message templates</h3>
+  </div>
+
+  <div class="flex-1 overflow-y-auto">
+    <div class="p-4 space-y-3">
+      <button *ngFor="let template of templates"
+              class="w-full text-left p-4 bg-[#F0F2F5] dark:bg-[#1F2C34] rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+        <span class="block text-[#111B21] dark:text-white font-medium mb-1">{{ template.title }}</span>
+        <span class="text-sm text-[#667781] dark:text-gray-400">{{ template.text }}</span>
+      </button>
+    </div>
+  </div>
+</div>

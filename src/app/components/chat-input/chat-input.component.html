@@ -1,0 +1,37 @@
+<div class="relative">
+  <attachment-menu *ngIf="showAttachmentMenu" (attachmentSelected)="onAttachment($event)"></attachment-menu>
+  <emoji-menu *ngIf="showEmojiMenu" (emojiSelected)="appendEmoji($event)"></emoji-menu>
+
+  <div class="bg-white dark:bg-[#1F2C34] p-3 border-t border-gray-200 dark:border-gray-700">
+    <div class="flex items-end space-x-2">
+      <div class="flex-1 flex items-end bg-[#F0F2F5] dark:bg-[#111B21] rounded-full px-3 py-2">
+        <textarea
+          #textarea
+          [(ngModel)]="message"
+          rows="1"
+          class="bg-transparent w-full resize-none overflow-hidden focus:outline-none text-sm text-[#111B21] dark:text-white"
+          placeholder="Type a message..."
+          (keydown)="handleKeyDown($event)"
+          (input)="autoGrow()"
+        ></textarea>
+
+        <div class="flex items-center space-x-2 ml-2">
+          <button (click)="toggleEmojiMenu()" class="text-[#667781] hover:text-[#111B21] dark:text-gray-400 dark:hover:text-white">
+            <i class="far fa-smile"></i>
+          </button>
+          <button (click)="toggleAttachmentMenu()" class="text-[#667781] hover:text-[#111B21] dark:text-gray-400 dark:hover:text-white">
+            <i class="fas fa-paperclip"></i>
+          </button>
+        </div>
+      </div>
+
+      <button (click)="onMicClick()" class="w-10 h-10 rounded-full bg-[#F0F2F5] dark:bg-[#111B21] flex items-center justify-center text-[#667781] dark:text-gray-300">
+        <i class="fas fa-microphone"></i>
+      </button>
+
+      <button (click)="send()" class="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center text-white">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>

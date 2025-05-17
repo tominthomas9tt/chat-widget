@@ -1,0 +1,8 @@
+<div class="emoji-menu bg-white dark:bg-[#1F2C34] rounded-lg shadow-lg w-64 p-3">
+  <div class="emoji-grid py-2">
+    <button *ngFor="let emoji of emojis" (click)="selectEmoji(emoji)"
+      class="text-xl hover:scale-110 transition-transform">
+      {{ emoji }}
+    </button>
+  </div>
+</div>
