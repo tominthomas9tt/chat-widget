@@ -8,6 +8,12 @@
     border-radius: 0 12px 12px 12px;
 }
 
+.chat-bubble-user {
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
 .dark .chat-bubble-user {
     background-color: #005C4B;
     color: white;

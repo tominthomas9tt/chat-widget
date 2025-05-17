@@ -28,7 +28,7 @@ export class ChatWidgetComponent {
   isDark = false;
   isRecording = false;
 
-  messages: { from: 'user' | 'agent', text: string, time: string }[] = [
+  messages: { from: 'user' | 'agent'; text: string; time: string }[] = [
     { from: 'agent', text: 'Hello! How can I help you today?', time: '10:03 AM' }
   ];
 
@@ -38,6 +38,7 @@ export class ChatWidgetComponent {
 
   toggleTheme() {
     this.isDark = !this.isDark;
+    console.log(this.isDark);
     document.documentElement.classList.toggle('dark', this.isDark);
   }
 
@@ -53,35 +54,17 @@ export class ChatWidgetComponent {
     this.isRecording = false;
   }
 
-  handleQuickReply(option: string) {
+  sendMessage(content: string) {
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    this.messages.push({ from: 'user', text: option, time });
+
+    this.messages.push({ from: 'user', text: content, time });
 
     setTimeout(() => {
       this.messages.push({
         from: 'agent',
-        text: `You selected: "${option}". How else can I assist?`,
+        text: `Thanks for your message: "${content}"`,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
     }, 1000);
   }
-
-  sendMessage(content: string) {
-  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-  this.messages.push({
-    from: 'user',
-    text: content,
-    time
-  });
-
-  // Optional: simulate agent reply
-  setTimeout(() => {
-    this.messages.push({
-      from: 'agent',
-      text: `Thanks for your message: "${content}"`,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    });
-  }, 1000);
-}
 }

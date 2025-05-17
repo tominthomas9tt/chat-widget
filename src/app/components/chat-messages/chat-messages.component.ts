@@ -23,9 +23,8 @@ export class ChatMessagesComponent implements AfterViewChecked {
   }
 
   private scrollToBottom() {
-    try {
-      const container = this.scrollContainer.nativeElement;
-      container.scrollTop = container.scrollHeight;
-    } catch (err) {}
+    if (this.scrollContainer?.nativeElement) {
+      this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+    }
   }
 }
