@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatHeaderComponent } from '../chat-header/chat-header.component';
 import { ChatMessagesComponent } from '../chat-messages/chat-messages.component';
@@ -37,7 +37,6 @@ import { ChatsynkService } from '../../../api/services/chatsynk.service';
   styleUrl: './chat-widget.component.scss'
 })
 export class ChatWidgetComponent {
-
   @Input() contactId!: number;
 
   isOpen = false;
@@ -45,27 +44,25 @@ export class ChatWidgetComponent {
   isDark = false;
   isRecording = false;
 
-  loadingContact: boolean = false;
+  loadingContact = false;
   contactDetails!: IContacts;
-
-  isLoadingMessages: boolean = false;
+  isLoadingMessages = false;
   whatsappMessages: IWhatsapp_message_logs[] = [];
 
   pollingInterval: any = null;
+  currentPollingIntervalMs = 5000;
+  emptyFetchCount = 0;
+  maxPollingIntervalMs = 60000;
 
   constructor(
     private contactService: ContactsService,
     private chatsynkService: ChatsynkService,
     private chatsynkMessageService: MessageService,
     private messageService: Whatsapp_message_logsService
-  ) {
-
-  }
+  ) {}
 
   ngAfterViewInit(): void {
-    if (this.contactId) {
-      this.getContactDetails();
-    }
+    if (this.contactId) this.getContactDetails();
   }
 
   toggleChat() {
@@ -74,65 +71,84 @@ export class ChatWidgetComponent {
       this.stopPolling();
       this.isOpen = !this.isOpen;
     } else {
-      this.getContactDetails()
+      this.getContactDetails();
     }
   }
 
   getContactDetails() {
-    if (this.contactId) {
-      this.loadingContact = true;
-      this.contactService.getDetails(Number(this.contactId)).subscribe((dataResponse: IResponse<IContacts>) => {
-        if (dataResponse.status) {
-          this.contactDetails = dataResponse.data as IContacts;
-          this.getMessages(this.contactDetails);
-        }
-        this.loadingContact = false;
-        this.isOpen = !this.isOpen;
-      })
-    }
+    if (!this.contactId) return;
+    this.loadingContact = true;
+    this.contactService.getDetails(this.contactId).subscribe((res: IResponse<IContacts>) => {
+      if (res.status) {
+        this.contactDetails = res.data as IContacts;
+        this.getMessages(this.contactDetails);
+      }
+      this.loadingContact = false;
+      this.isOpen = true;
+    });
   }
 
   getMessages(contact: IContacts) {
     this.isLoadingMessages = true;
-    let messageFilter: Whatsapp_message_logsFilter = {
+    const filter: Whatsapp_message_logsFilter = {
       contact_wa_id: contact.wa_id,
       sort: [new SortItem('messaged_at', 'DESC')]
     };
-    this.messageService.getAll(messageFilter).subscribe((dataResponse: IResponse<IMultiresult<IWhatsapp_message_logs>>) => {
-      if (dataResponse.status) {
-        // this.whatsappMessages = dataResponse.data?.records as IWhatsapp_message_logs[];
-        this.whatsappMessages = (dataResponse.data?.records ?? []).reverse(); // 👈 reverse newest-to-oldest
-        // sorted.forEach(msg => this.addMessage(msg.message ?? "", msg.is_incoming_message == 0 ? 'user' : 'agent', msg.messaged_at, msg.status))
+    this.messageService.getAll(filter).subscribe((res: IResponse<IMultiresult<IWhatsapp_message_logs>>) => {
+      if (res.status) {
+        this.whatsappMessages = (res.data?.records ?? []).reverse();
         this.startPollingNewMessages(contact);
       }
       this.isLoadingMessages = false;
-    })
-  }
-
-  fetchNewMessages(contact: IContacts) {
-    if (!this.whatsappMessages.length) return;
-
-    // Get latest messaged_at from current list
-    const latestTime = this.whatsappMessages[this.whatsappMessages.length - 1]._id;
-
-    const filter: Whatsapp_message_logsFilter = {
-      contact_wa_id: contact.wa_id,
-      sort: [new SortItem('messaged_at', 'ASC')],
-      '_id>': latestTime
-    };
-
-    this.messageService.getAll(filter).subscribe((res: IResponse<IMultiresult<IWhatsapp_message_logs>>) => {
-      if (res.status && res.data?.records?.length) {
-        res.data.records.forEach(msg => {
-          this.addMessage(msg);
-        });
-      }
     });
   }
 
+  fetchNewMessages(contact: IContacts) {
+    if (!this.whatsappMessages.length) return this.scheduleNextPoll(contact);
+
+    const latestId = this.whatsappMessages[this.whatsappMessages.length - 1]._id;
+    const filter: Whatsapp_message_logsFilter = {
+      contact_wa_id: contact.wa_id,
+      sort: [new SortItem('messaged_at', 'ASC')],
+      '_id>': latestId
+    };
+
+    this.messageService.getAll(filter).subscribe((res: IResponse<IMultiresult<IWhatsapp_message_logs>>) => {
+      const newMessages = res.data?.records ?? [];
+
+      if (res.status && newMessages.length > 0) {
+        newMessages.forEach(msg => this.addMessage(msg));
+        this.emptyFetchCount = 0;
+        this.currentPollingIntervalMs = 5000;
+      } else {
+        this.emptyFetchCount++;
+        this.currentPollingIntervalMs = Math.min(5000 * Math.pow(2, this.emptyFetchCount), this.maxPollingIntervalMs);
+      }
+
+      this.scheduleNextPoll(contact);
+    });
+  }
 
   addMessage(message: IWhatsapp_message_logs) {
     this.whatsappMessages.push(message);
+  }
+
+  startPollingNewMessages(contact: IContacts) {
+    if (this.pollingInterval) clearTimeout(this.pollingInterval);
+    this.scheduleNextPoll(contact);
+  }
+
+  scheduleNextPoll(contact: IContacts) {
+    this.pollingInterval = setTimeout(() => {
+      this.fetchNewMessages(contact);
+    }, this.currentPollingIntervalMs);
+  }
+
+  stopPolling() {
+    if (this.pollingInterval) {
+      clearTimeout(this.pollingInterval);
+      this.pollingInterval = null;
+    }
   }
 
   toggleTheme() {
@@ -153,75 +169,27 @@ export class ChatWidgetComponent {
   }
 
   voiceSent(blob: Blob) {
-    this.chatsynkService.uploadVoiceNote(blob).subscribe((dataRepsonse: any) => {
-      console.log(dataRepsonse);
+    this.chatsynkService.uploadVoiceNote(blob).subscribe((res: any) => {
       this.sendVoiceNote('http://angular-trial.esy.es/new1.ogg');
-    })
+    });
   }
-  
+
   sendVoiceNote(url: string) {
-    let payload: SendMessagePayload = {
+    const payload: SendMessagePayload = {
       type: MESSAGE_TYPE.MEDIA,
-      phone_number: this.contactDetails.wa_id ?? "",
+      phone_number: this.contactDetails.wa_id ?? '',
       media_url: url,
       media_type: 'audio'
-    }
-    this.chatsynkMessageService.sendMessage(payload).subscribe({
-      next: (res) => {
-        if (res?.result === 'success' && res.data) {
-          // this.addMessage(content, 'user');
-          console.log('Log UID:', res.data.log_uid);
-          console.log('Status:', res.data.status);
-        } else {
-          console.warn('Message failed:', res?.message || 'Unknown error');
-        }
-      },
-      error: (err: any) => {
-        console.error('Send error:', err);
-      },
-    });
+    };
+    this.chatsynkMessageService.sendMessage(payload).subscribe();
   }
 
-  sendMessage(content: string, type = "text") {
-    let payload: SendMessagePayload = {
+  sendMessage(content: string) {
+    const payload: SendMessagePayload = {
       type: MESSAGE_TYPE.TEXT,
-      phone_number: this.contactDetails.wa_id ?? "",
+      phone_number: this.contactDetails.wa_id ?? '',
       message_body: content
-    }
-    this.chatsynkMessageService.sendMessage(payload).subscribe({
-      next: (res) => {
-        if (res?.result === 'success' && res.data) {
-          // this.addMessage(content, 'user');
-          console.log('Log UID:', res.data.log_uid);
-          console.log('Status:', res.data.status);
-        } else {
-          console.warn('Message failed:', res?.message || 'Unknown error');
-        }
-      },
-      error: (err: any) => {
-        console.error('Send error:', err);
-      },
-    });
-    // this.addMessage(content, 'user');
-
-    // setTimeout(() => {
-    //   this.addMessage(`Thanks for your message: "${content}"`, 'agent');
-    // }, 1000);
+    };
+    this.chatsynkMessageService.sendMessage(payload).subscribe();
   }
-
-  startPollingNewMessages(contact: IContacts, intervalMs = 5000) {
-    if (this.pollingInterval) clearInterval(this.pollingInterval); // clear previous
-
-    this.pollingInterval = setInterval(() => {
-      this.fetchNewMessages(contact);
-    }, intervalMs);
-  }
-
-  stopPolling() {
-    if (this.pollingInterval) {
-      clearInterval(this.pollingInterval);
-      this.pollingInterval = null;
-    }
-  }
-
 }

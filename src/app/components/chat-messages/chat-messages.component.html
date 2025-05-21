@@ -13,7 +13,7 @@
 
             <!-- Audio or Text rendering -->
             <ng-container *ngIf="getMessageType(msg) === 'audio';">
-              <audio controls class="w-full">
+              <audio controls class="max-w-full">
                 <source [src]="getAudioUrl(msg)" type="audio/ogg">
                 Your browser does not support the audio element.
               </audio>
@@ -25,17 +25,17 @@
             </ng-container>
 
           </div>
-          <span class="text-xs text-[#667781] dark:text-gray-400 ml-2">{{ msg.messaged_at }}</span>
+          <span class="text-xs text-[#667781] dark:text-gray-400 ml-2">{{ msg.messaged_at|date:"HH:mm" }}</span>
         </div>
       </div>
 
       <div *ngIf="msg.is_incoming_message == 0" class="flex items-end justify-end mb-4">
         <div class="flex flex-col space-y-2 items-end max-w-[80%]">
-          <div class="chat-bubble-user p-3 shadow-sm relative pr-2">
+          <div class="chat-bubble-user p-3 shadow-sm relative pr-5">
 
-            <ng-container *ngIf="getMessageType1(msg) === 'audio'; else textMsg">
-              <audio controls>
-                <source [src]="getAudioUrl1(msg)" type="audio/ogg">
+            <ng-container *ngIf="getMessageType(msg) === 'audio'; else textMsg">
+              <audio controls class="max-w-full">
+                <source [src]="getAudioUrl(msg)" type="audio/ogg">
                 Your browser does not support the audio element.
               </audio>
             </ng-container>
