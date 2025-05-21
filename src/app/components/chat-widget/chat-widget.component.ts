@@ -126,7 +126,6 @@ export class ChatWidgetComponent {
         res.data.records.forEach(msg => {
           this.addMessage(msg);
         });
-        return true;
       }
     });
   }
