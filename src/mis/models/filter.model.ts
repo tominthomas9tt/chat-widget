@@ -31,4 +31,6 @@ export abstract class Filter {
 
   public selectMode?: SELECT_MODE;
 
+  [key: string]: any;
+
 }

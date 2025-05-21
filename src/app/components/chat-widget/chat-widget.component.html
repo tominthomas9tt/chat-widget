@@ -15,7 +15,7 @@
           <loader></loader>
         </div>
         <ng-container *ngIf="!isLoadingMessages">
-          <chat-messages class="flex-1 min-h-0" [messages]="messages"></chat-messages>
+          <chat-messages class="flex-1 min-h-0" [messages]="whatsappMessages"></chat-messages>
         </ng-container>
 
         <!-- <quick-reply
@@ -23,7 +23,8 @@
           (reply)="handleQuickReply($event)">
         </quick-reply> -->
 
-        <recording-overlay *ngIf="isRecording" [isRecording]="isRecording" (cancel)="stopRecording()">
+        <recording-overlay *ngIf="isRecording" [isRecording]="isRecording" (send)="voiceSent($event)"
+          (cancel)="stopRecording()">
         </recording-overlay>
 
         <chat-input (micClick)="toggleRecording()" (messageSend)="sendMessage($event)">

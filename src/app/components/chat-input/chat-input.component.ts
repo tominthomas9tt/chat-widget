@@ -4,6 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { EmojiMenuComponent } from '../emoji-menu/emoji-menu.component';
 import { AttachmentMenuComponent } from '../attachment-menu/attachment-menu.component';
 
+
+export class SendItem{
+  message?:string;
+  mediaType?:'document'|'audio'|'text';
+  mediaUrl?:'string';
+  media?:any;
+  mediaFilename?:string;
+}
+
 @Component({
   selector: 'chat-input',
   standalone: true,

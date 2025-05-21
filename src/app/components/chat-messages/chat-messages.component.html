@@ -7,28 +7,64 @@
     </div>
 
     <ng-container *ngFor="let msg of messages">
-  <div *ngIf="msg.from === 'agent'" class="flex items-end mb-4">
-    <div class="flex flex-col space-y-2 max-w-[80%]">
-      <div class="chat-bubble-agent p-3 shadow-sm">
-        <p class="text-sm text-[#111B21] dark:text-black break-words">
-          {{ msg.text }}
-        </p>
-      </div>
-      <span class="text-xs text-[#667781] dark:text-gray-400 ml-2">{{ msg.time }}</span>
-    </div>
-  </div>
+      <div *ngIf="msg.is_incoming_message == 1" class="flex items-end mb-4">
+        <div class="flex flex-col space-y-2 max-w-[80%]">
+          <div class="chat-bubble-agent p-3 shadow-sm">
 
-  <div *ngIf="msg.from === 'user'" class="flex items-end justify-end mb-4">
-    <div class="flex flex-col space-y-2 items-end max-w-[80%]">
-      <div class="chat-bubble-user p-3 shadow-sm">
-        <p class="text-sm text-[#111B21] dark:text-black break-words">
-          {{ msg.text }}
-        </p>
+            <!-- Audio or Text rendering -->
+            <ng-container *ngIf="getMessageType(msg) === 'audio';">
+              <audio controls class="w-full">
+                <source [src]="getAudioUrl(msg)" type="audio/ogg">
+                Your browser does not support the audio element.
+              </audio>
+            </ng-container>
+            <ng-container *ngIf="messages !=null ">
+              <p class="text-sm text-[#111B21] dark:text-black break-words">
+                {{ msg.message }}
+              </p>
+            </ng-container>
+
+          </div>
+          <span class="text-xs text-[#667781] dark:text-gray-400 ml-2">{{ msg.messaged_at }}</span>
+        </div>
       </div>
-      <span class="text-xs text-[#667781] dark:text-gray-400 mr-2">{{ msg.time }}</span>
-    </div>
-  </div>
-</ng-container>
+
+      <div *ngIf="msg.is_incoming_message == 0" class="flex items-end justify-end mb-4">
+        <div class="flex flex-col space-y-2 items-end max-w-[80%]">
+          <div class="chat-bubble-user p-3 shadow-sm relative pr-2">
+
+            <ng-container *ngIf="getMessageType1(msg) === 'audio'; else textMsg">
+              <audio controls>
+                <source [src]="getAudioUrl1(msg)" type="audio/ogg">
+                Your browser does not support the audio element.
+              </audio>
+            </ng-container>
+
+            <ng-template #textMsg>
+              <ng-container *ngIf="msg.message; else unsupportedMsg">
+                <p class="text-sm text-[#111B21] dark:text-black break-words">
+                  {{ msg.message }}
+                </p>
+              </ng-container>
+            </ng-template>
+
+            <ng-template #unsupportedMsg>
+              <p class="text-sm text-[#888] italic">Unsupported message format</p>
+            </ng-template>
+
+            <!-- ✅ Tick Icon -->
+            <span
+              class="absolute bottom-1 right-2 text-xs text-gray-400 dark:text-gray-300 flex items-center space-x-1">
+              <i *ngIf="msg.status === 'sent'" class="fas fa-check text-gray-400 text-[11px]"></i>
+              <i *ngIf="msg.status === 'delivered'" class="fas fa-check-double text-gray-400 text-[11px]"></i>
+              <i *ngIf="msg.status === 'read'" class="fas fa-check-double text-blue-500 text-[11px]"></i>
+            </span>
+          </div>
+          <span class="text-xs text-[#667781] dark:text-gray-400 mr-2">{{ msg.messaged_at|date:"HH:mm"}}</span>
+        </div>
+      </div>
+
+    </ng-container>
 
   </div>
 </div>
