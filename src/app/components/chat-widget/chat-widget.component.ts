@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatHeaderComponent } from '../chat-header/chat-header.component';
 import { ChatMessagesComponent } from '../chat-messages/chat-messages.component';
-import { ChatInputComponent } from '../chat-input/chat-input.component';
+import { ChatInputComponent, SendItem } from '../chat-input/chat-input.component';
 import { RecordingOverlayComponent } from '../recording-overlay/recording-overlay.component';
 import { TemplatesScreenComponent } from '../templates-screen/templates-screen.component';
 import { QuickReplyComponent } from '../quick-reply/quick-reply.component';
@@ -14,7 +14,7 @@ import { IMultiresult, IResponse } from '../../../mis/interfaces/reponse.interfa
 import { ContactsService } from '../../../api/services/contacts.service';
 import { LoaderComponent } from '../loader/loader.component';
 import { MessageService } from '../../../api/chatsynk/message.service';
-import { SendMessagePayload } from '../../../api/chatsynk/message.interface';
+import { MediaType, SendMessagePayload } from '../../../api/chatsynk/message.interface';
 import { SendMessageResponse } from '../../../api/chatsynk/message.model';
 import { MESSAGE_TYPE } from '../../../api/chatsynk/type.enum.ts';
 import { SortItem } from '../../../mis/models/filter.model';
@@ -59,7 +59,7 @@ export class ChatWidgetComponent {
     private chatsynkService: ChatsynkService,
     private chatsynkMessageService: MessageService,
     private messageService: Whatsapp_message_logsService
-  ) {}
+  ) { }
 
   ngAfterViewInit(): void {
     if (this.contactId) this.getContactDetails();
@@ -189,6 +189,30 @@ export class ChatWidgetComponent {
       type: MESSAGE_TYPE.TEXT,
       phone_number: this.contactDetails.wa_id ?? '',
       message_body: content
+    };
+    this.chatsynkMessageService.sendMessage(payload).subscribe();
+  }
+
+  handleFile(item: SendItem) {
+    if (item.media && item.mediaType) {
+      this.chatsynkService.uploadFile(item.media, item.mediaType).subscribe({
+        next: (res: any) => {
+          console.log('Upload response:', res);
+          this.sendImage('http://angular-trial.esy.es/1747845957_aa02d385750a7c8dced7.pdf', item.mediaType as MediaType);
+
+          // Emit or append uploaded media URL to chat
+        },
+        error: (err) => console.error('Upload failed:', err)
+      });
+    }
+  }
+
+  sendImage(url: string, media_Type: MediaType) {
+    const payload: SendMessagePayload = {
+      type: MESSAGE_TYPE.MEDIA,
+      phone_number: this.contactDetails.wa_id ?? '',
+      media_url: url,
+      media_type: media_Type
     };
     this.chatsynkMessageService.sendMessage(payload).subscribe();
   }

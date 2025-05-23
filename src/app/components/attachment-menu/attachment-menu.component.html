@@ -1,10 +1,9 @@
-<div class="attachment-menu bg-white dark:bg-[#1F2C34] rounded-lg shadow-lg w-64 p-2">
+<div class="attachment-menu bg-white dark:bg-[#1F2C34] rounded-lg shadow-lg p-2">
   <div class="grid grid-cols-4 gap-2">
-    <button *ngFor="let item of options"
-            (click)="select(item.label)"
-            class="flex flex-col items-center justify-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+    <button *ngFor="let item of options" (click)="select(item.label)" [title]="item.label"
+      class="flex flex-col items-center justify-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
       <div class="w-10 h-10 rounded-full flex items-center justify-center mb-1"
-           [ngStyle]="{ 'background-color': item.color + '33' }">
+        [ngStyle]="{ 'background-color': item.color + '33' }">
         <i [class]="item.icon + ' text-lg'" [ngStyle]="{ color: item.color }"></i>
       </div>
       <span class="text-xs text-[#111B21] dark:text-white">{{ item.label }}</span>

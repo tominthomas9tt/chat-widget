@@ -11,11 +11,17 @@ export class ChatsynkService {
   constructor(private http: HttpClient) { }
 
   uploadVoiceNote(blob: Blob) {
-    console.log('MIME type:', blob.type);
     const formData = new FormData();
     formData.append('audio', blob, 'voice-note.webm');
-
     return this.http.post<{ url: string }>(this.baseUrl + '/audio/upload', formData);
+  }
+
+  uploadFile(file: File, mediaType: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('media_type', mediaType);
+
+    return this.http.post(this.baseUrl + '/upload', formData); // adjust path as needed
   }
 
 }

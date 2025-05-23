@@ -3,14 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmojiMenuComponent } from '../emoji-menu/emoji-menu.component';
 import { AttachmentMenuComponent } from '../attachment-menu/attachment-menu.component';
+import { MediaType } from '../../../api/chatsynk/message.interface';
 
 
-export class SendItem{
-  message?:string;
-  mediaType?:'document'|'audio'|'text';
-  mediaUrl?:'string';
-  media?:any;
-  mediaFilename?:string;
+export class SendItem {
+  message?: string;
+  mediaType?: MediaType;
+  mediaUrl?: string;
+  media?: any;
+  mediaFilename?: string;
 }
 
 @Component({
@@ -23,8 +24,10 @@ export class SendItem{
 export class ChatInputComponent {
   @Output() micClick = new EventEmitter<void>();
   @Output() messageSend = new EventEmitter<string>();
+  @Output() fileSelected = new EventEmitter<SendItem>();
 
   @ViewChild('textarea') textarea!: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   message = '';
   showEmojiMenu = false;
@@ -69,8 +72,31 @@ export class ChatInputComponent {
   }
 
   onAttachment(option: string) {
-    console.log('Attachment selected:', option);
     this.showAttachmentMenu = false;
+    if (['Image', 'File'].includes(option)) {
+      this.fileInput.nativeElement.accept =
+        option === 'Image' ? 'image/*' : '*';
+      this.fileInput.nativeElement.click();
+    }
+
+    // handle other types (Camera, Contact, etc.) here
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+
+      const sendItem: SendItem = {
+        media: file,
+        mediaFilename: file.name,
+        mediaType: file.type.startsWith('image') ? 'image' : 'document',
+      };
+
+      this.fileSelected.emit(sendItem);
+    }
+
+    input.value = ''; // reset input so same file can be selected again
   }
 
   onMicClick() {

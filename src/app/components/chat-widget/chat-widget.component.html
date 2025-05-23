@@ -27,7 +27,7 @@
           (cancel)="stopRecording()">
         </recording-overlay>
 
-        <chat-input (micClick)="toggleRecording()" (messageSend)="sendMessage($event)">
+        <chat-input (micClick)="toggleRecording()" (messageSend)="sendMessage($event)" (fileSelected)="handleFile($event)">
         </chat-input>
       </div>
     </ng-container>

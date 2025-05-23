@@ -55,15 +55,26 @@ export class ChatMessagesComponent implements AfterViewInit, OnChanges {
         const message = data?.webhook_responses?.incoming?.[0]?.changes?.[0]?.value?.messages?.[0];
         return message?.type || 'text';
       } else {
-        if (data.media_values && data.media_values.type === 'audio') {
-          return 'audio';
+        const type = data.media_values?.type;
+        if (!type) return 'text';
+
+        switch (type) {
+          case 'audio':
+          case 'image':
+          case 'video':
+          case 'document':
+          case 'sticker':
+          case 'location':
+            return type;
+          default:
+            return 'text';
         }
-        return 'text';
       }
     } catch {
-      return 'text';
+      return 'unsupported';
     }
   }
+
 
   getAudioUrl(msg: any): string | null {
     try {
@@ -77,5 +88,26 @@ export class ChatMessagesComponent implements AfterViewInit, OnChanges {
     } catch {
       return msg.is_incoming_msg === 1 ? '' : null;
     }
+  }
+
+  getImageUrl(msg: any): string | null {
+    try {
+      const data = JSON.parse(msg.__data || '{}');
+
+      if (msg.is_incoming_msg === 1) {
+        return data?.media_values?.link || '';
+      } else {
+        return data.media_values?.link || null;
+      }
+    } catch {
+      return msg.is_incoming_msg === 1 ? '' : null;
+    }
+  }
+
+
+  openFullImage(url: string | null) {
+    // Open in a new tab for now — or use modal
+    if (url)
+      window.open(url, '_blank');
   }
 }

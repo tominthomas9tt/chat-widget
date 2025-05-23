@@ -20,13 +20,14 @@
           </button>
         </div>
       </div>
-
+      <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" />
       <button (click)="onMicClick()" *ngIf="message==''"
         class="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center text-white">
         <i class="fas fa-microphone"></i>
       </button>
 
-      <button *ngIf="message!==''" (click)="send()" class="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center text-white">
+      <button *ngIf="message!==''" (click)="send()"
+        class="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center text-white">
         <i class="fas fa-paper-plane"></i>
       </button>
     </div>

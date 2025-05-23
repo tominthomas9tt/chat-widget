@@ -10,20 +10,35 @@
       <div *ngIf="msg.is_incoming_message == 1" class="flex items-end mb-4">
         <div class="flex flex-col space-y-2 max-w-[80%]">
           <div class="chat-bubble-agent p-3 shadow-sm">
+            <ng-container [ngSwitch]="getMessageType(msg)">
+              <!-- Image Preview -->
+              <ng-container *ngSwitchCase="'image'">
+                <img [src]="getImageUrl(msg)" alt="Image"
+                  class="rounded-md max-w-[200px] max-h-[200px] object-cover cursor-pointer"
+                  (click)="openFullImage(getImageUrl(msg))" />
+              </ng-container>
 
-            <!-- Audio or Text rendering -->
-            <ng-container *ngIf="getMessageType(msg) === 'audio';">
-              <audio controls class="max-w-full">
-                <source [src]="getAudioUrl(msg)" type="audio/ogg">
-                Your browser does not support the audio element.
-              </audio>
-            </ng-container>
-            <ng-container *ngIf="messages !=null ">
-              <p class="text-sm text-[#111B21] dark:text-black break-words">
-                {{ msg.message }}
-              </p>
+              <!-- Audio -->
+              <ng-container *ngSwitchCase="'audio'">
+                <audio controls class="max-w-full">
+                  <source [src]="getAudioUrl(msg)" type="audio/ogg">
+                  Your browser does not support the audio element.
+                </audio>
+              </ng-container>
+
+              <!-- Text -->
+              <ng-container *ngSwitchDefault>
+                <ng-container *ngIf="msg.message; else unsupportedMsg">
+                  <p class="text-sm text-[#111B21] dark:text-black break-words">
+                    {{ msg.message }}
+                  </p>
+                </ng-container>
+              </ng-container>
             </ng-container>
 
+            <ng-template #unsupportedMsg>
+              <p class="text-sm text-[#888] italic">Unsupported message format</p>
+            </ng-template>
           </div>
           <span class="text-xs text-[#667781] dark:text-gray-400 ml-2">{{ msg.messaged_at|date:"HH:mm" }}</span>
         </div>
@@ -33,20 +48,31 @@
         <div class="flex flex-col space-y-2 items-end max-w-[80%]">
           <div class="chat-bubble-user p-3 shadow-sm relative pr-5">
 
-            <ng-container *ngIf="getMessageType(msg) === 'audio'; else textMsg">
-              <audio controls class="max-w-full">
-                <source [src]="getAudioUrl(msg)" type="audio/ogg">
-                Your browser does not support the audio element.
-              </audio>
-            </ng-container>
-
-            <ng-template #textMsg>
-              <ng-container *ngIf="msg.message; else unsupportedMsg">
-                <p class="text-sm text-[#111B21] dark:text-black break-words">
-                  {{ msg.message }}
-                </p>
+            <ng-container [ngSwitch]="getMessageType(msg)">
+              <!-- Image Preview -->
+              <ng-container *ngSwitchCase="'image'">
+                <img [src]="getImageUrl(msg)" alt="Image"
+                  class="rounded-md max-w-[200px] max-h-[200px] object-cover cursor-pointer"
+                  (click)="openFullImage(getImageUrl(msg))" />
               </ng-container>
-            </ng-template>
+
+              <!-- Audio -->
+              <ng-container *ngSwitchCase="'audio'">
+                <audio controls class="max-w-full">
+                  <source [src]="getAudioUrl(msg)" type="audio/ogg">
+                  Your browser does not support the audio element.
+                </audio>
+              </ng-container>
+
+              <!-- Text -->
+              <ng-container *ngSwitchDefault>
+                <ng-container *ngIf="msg.message; else unsupportedMsg">
+                  <p class="text-sm text-[#111B21] dark:text-black break-words">
+                    {{ msg.message }}
+                  </p>
+                </ng-container>
+              </ng-container>
+            </ng-container>
 
             <ng-template #unsupportedMsg>
               <p class="text-sm text-[#888] italic">Unsupported message format</p>

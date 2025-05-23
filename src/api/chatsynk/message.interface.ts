@@ -1,5 +1,7 @@
 import { MESSAGE_TYPE } from "./type.enum.ts";
 
+export type MediaType = 'document' | 'audio' | 'image' | 'text';
+
 export interface ContactInfo {
     first_name: string;
     last_name: string;
@@ -23,7 +25,7 @@ export interface TextMessagePayload extends BaseMessagePayload {
 
 export interface MediaMessagePayload extends BaseMessagePayload {
     type: MESSAGE_TYPE.MEDIA;
-    media_type: 'image' | 'video' | 'document' | 'audio';
+    media_type: MediaType;
     media_url: string;
     caption?: string;
     file_name?: string;
