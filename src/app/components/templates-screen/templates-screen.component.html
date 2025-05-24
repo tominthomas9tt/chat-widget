@@ -6,13 +6,92 @@
     <h3 class="font-semibold">Message templates</h3>
   </div>
 
-  <div class="flex-1 overflow-y-auto">
-    <div class="p-4 space-y-3">
-      <button *ngFor="let template of templates"
-              class="w-full text-left p-4 bg-[#F0F2F5] dark:bg-[#1F2C34] rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-        <span class="block text-[#111B21] dark:text-white font-medium mb-1">{{ template.title }}</span>
-        <span class="text-sm text-[#667781] dark:text-gray-400">{{ template.text }}</span>
-      </button>
+  <div class="flex flex-col flex-1 overflow-y-auto message-bg">
+    <div *ngIf="isLoadingTemplates" class="flex-1 flex items-center justify-center">
+      <loader></loader>
     </div>
+    <ng-container *ngIf="!isLoadingTemplates">
+      <div class="p-4 space-y-3">
+        <div *ngFor="let template of templates"
+          class="w-full text-left p-4 bg-[#FFFFFF] dark:bg-[#1F2C34] rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+
+          <div class="block text-[#111B21] dark:text-white font-medium mb-1" (click)="onTemplateSelected(parsetemplate(template))">
+            {{ template.template_name }}
+          </div>
+
+          <ng-container *ngIf="parsetemplate(template) as parsed">
+            <div *ngFor="let comp of parsed.components">
+              <!-- HEADER -->
+              <div *ngIf="comp.type === 'HEADER'" class="font-semibold text-[#111B21] dark:text-white">
+                <ng-container [ngSwitch]="comp.format">
+                  <div *ngSwitchCase="'TEXT'">
+                    {{ comp.text }}
+                  </div>
+                  <div *ngSwitchCase="'IMAGE'">
+                    <img [src]="getExampleMedia(comp, 'header_handle')" alt="Image Header" class="max-w-xs rounded" />
+                  </div>
+                  <div *ngSwitchCase="'VIDEO'">
+                    <video class="max-w-xs rounded" controls>
+                      <source [src]="getExampleMedia(comp, 'header_handle')" type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                  <div *ngSwitchCase="'DOCUMENT'">
+                    <a [href]="getExampleMedia(comp, 'header_handle')" target="_blank" class="text-blue-500 underline">
+                      View Document
+                    </a>
+                  </div>
+                </ng-container>
+              </div>
+
+              <!-- BODY -->
+              <div *ngIf="comp.type === 'BODY'" class="text-sm text-[#111B21] dark:text-white my-1">
+                {{ comp.text }}
+              </div>
+
+              <!-- FOOTER -->
+              <div *ngIf="comp.type === 'FOOTER'" class="text-xs text-[#667781] dark:text-gray-400 italic mt-1">
+                {{ comp.text }}
+              </div>
+
+              <!-- BUTTONS -->
+              <div *ngIf="comp.type === 'BUTTONS'" class="flex flex-col gap-2 mt-2">
+                <button *ngFor="let btn of comp.buttons" class="w-full flex justify-center items-center space-x-2 px-3 py-2 border rounded
+         bg-white dark:bg-gray-800 dark:border-gray-600 border-gray-400
+         text-[#128C7E] dark:text-green-400 text-sm font-semibold
+         hover:bg-[#DCF8C6] dark:hover:bg-[#075E54] transition">
+
+                  <ng-container [ngSwitch]="btn.type">
+                    <!-- Quick Reply SVG icon -->
+                    <svg *ngSwitchCase="'QUICK_REPLY'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0"
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+                      <circle cx="12" cy="12" r="4" fill="currentColor" />
+                    </svg>
+
+                    <!-- URL SVG icon -->
+                    <svg *ngSwitchCase="'URL'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0"
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M10 14a2 2 0 002 2h4a2 2 0 002-2v-4a2 2 0 00-2-2h-4a2 2 0 00-2 2v4z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 10V6a2 2 0 012-2h4a2 2 0 012 2v4" />
+                    </svg>
+
+                    <!-- Phone Number SVG icon -->
+                    <svg *ngSwitchCase="'PHONE_NUMBER'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0"
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 5h2l3.6 7.59-1.35 2.45a11.04 11.04 0 005.35 5.35l2.45-1.35L19 19v2a2 2 0 01-2 2h-1c-6.627 0-12-5.373-12-12V7a2 2 0 012-2z" />
+                    </svg>
+                  </ng-container>
+
+                  <span>{{ btn.text }}</span>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </div>

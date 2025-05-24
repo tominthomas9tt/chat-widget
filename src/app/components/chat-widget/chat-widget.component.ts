@@ -15,10 +15,10 @@ import { ContactsService } from '../../../api/services/contacts.service';
 import { LoaderComponent } from '../loader/loader.component';
 import { MessageService } from '../../../api/chatsynk/message.service';
 import { MediaType, SendMessagePayload } from '../../../api/chatsynk/message.interface';
-import { SendMessageResponse } from '../../../api/chatsynk/message.model';
 import { MESSAGE_TYPE } from '../../../api/chatsynk/type.enum.ts';
 import { SortItem } from '../../../mis/models/filter.model';
 import { ChatsynkService } from '../../../api/services/chatsynk.service';
+import { WhatsAppTemplatePayload } from '../../../api/whatsapp/interfaces/template.interface';
 
 @Component({
   selector: 'chat-widget',
@@ -53,6 +53,11 @@ export class ChatWidgetComponent {
   currentPollingIntervalMs = 5000;
   emptyFetchCount = 0;
   maxPollingIntervalMs = 60000;
+
+  hasMoreOlderMessages = true; // example, set to false when no older messages left
+  loadingOlderMessages = false;
+
+  page: number = 0;
 
   constructor(
     private contactService: ContactsService,
@@ -90,14 +95,16 @@ export class ChatWidgetComponent {
 
   getMessages(contact: IContacts) {
     this.isLoadingMessages = true;
+    this.page = 0;
     const filter: Whatsapp_message_logsFilter = {
+      page: this.page,
       contact_wa_id: contact.wa_id,
       sort: [new SortItem('messaged_at', 'DESC')]
     };
     this.messageService.getAll(filter).subscribe((res: IResponse<IMultiresult<IWhatsapp_message_logs>>) => {
       if (res.status) {
         this.whatsappMessages = (res.data?.records ?? []).reverse();
-        this.startPollingNewMessages(contact);
+        // this.startPollingNewMessages(contact);
       }
       this.isLoadingMessages = false;
     });
@@ -128,6 +135,28 @@ export class ChatWidgetComponent {
       this.scheduleNextPoll(contact);
     });
   }
+
+  loadOlderMessages() {
+    if (this.loadingOlderMessages) return;
+
+    this.loadingOlderMessages = true;
+    const filter: Whatsapp_message_logsFilter = {
+      page: ++this.page,
+      contact_wa_id: this.contactDetails.wa_id,
+      sort: [new SortItem('messaged_at', 'DESC')]
+    };
+    this.messageService.getAll(filter).subscribe((res: IResponse<IMultiresult<IWhatsapp_message_logs>>) => {
+      if (res.status) {
+        if (res.data!.records.length > 0) {
+          this.whatsappMessages = [...(res.data?.records ?? []).reverse(), ...this.whatsappMessages];
+        } else {
+          this.hasMoreOlderMessages = false; // no more messages
+        }
+      }
+      this.loadingOlderMessages = false;
+    });
+  }
+
 
   addMessage(message: IWhatsapp_message_logs) {
     this.whatsappMessages.push(message);
@@ -214,6 +243,31 @@ export class ChatWidgetComponent {
       media_url: url,
       media_type: media_Type
     };
+    this.chatsynkMessageService.sendMessage(payload).subscribe();
+  }
+
+  onTemplateSelected($event: WhatsAppTemplatePayload) {
+    this.sendTemplateMessage($event);
+    this.showTemplates = false;
+  }
+
+  sendTemplateMessage(template: WhatsAppTemplatePayload, headerImage: string = 'https://agoodmorning.in/wp-content/uploads/2024/09/good-morning-good-morning-flowers-picture-good-morning-flowers-with-love-good-morning-blue-flowers-morning-flowers_36.jpg?v=1726425170') {
+    const payload: SendMessagePayload = {
+      type: MESSAGE_TYPE.TEMPLATE,
+      template_name: template.name,
+      template_language: template.language,
+      phone_number: this.contactDetails.wa_id ?? '',
+    };
+
+    const hasImageHeader = template.components?.some(
+      comp => comp.type === 'HEADER' && comp.format === 'IMAGE'
+    );
+
+    if (hasImageHeader && headerImage) {
+      // Dynamically add header_image property
+      (payload as any).header_image = headerImage;
+    }
+
     this.chatsynkMessageService.sendMessage(payload).subscribe();
   }
 }
